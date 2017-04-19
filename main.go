@@ -14,6 +14,7 @@ func main() {
     dd := flag.String("driver", "sqlite3", "The database driver to use")
     dc := flag.String("creds", "/tmp/main.db", "The database credentials")
     p := flag.String("port", ":8080", "The port on which this listens")
+    w := flag.Bool("w", false, "Performs a watch operation on load if set")
 
     flag.Parse()
 
@@ -25,6 +26,10 @@ func main() {
         Migrate()
     }
 
+    if *w {
+        watcher.Watch()
+    }
+
     if *r {
         gocron.Every(1).Minute().Do(watcher.Watch)
         gocron.Start()
@@ -34,7 +39,6 @@ func main() {
 
 func Migrate() {
     core.App.Log.Debug("Starting Migrations")
-    core.App.DB.AutoMigrate(&core.Subject{})
-    core.App.DB.AutoMigrate(&core.Audit{})
+    core.App.DB.AutoMigrate(&core.Audit{}, &core.Subject{})
     core.App.Log.Debug("Finished Migrations")
 }

@@ -35,14 +35,17 @@ func GetSubjects(w http.ResponseWriter, r *http.Request) {
 // [GET] /api/v1/subject/{id}
 func GetSubjectDetails(w http.ResponseWriter, r *http.Request) {
     var s core.Subject
+    var a []core.Audit
     params := mux.Vars(r)
 
-    if err := core.App.DB.Where("ext_id = ?", params["id"]).Preload("Audits").Find(&s).Error; err != nil {
+    if err := core.App.DB.Where("ext_id = ?", params["id"]).Find(&s).Error; err != nil {
         core.WriteResponse(w, 404, core.RestResponse{Error: "Subject not found"})
         return
     }
 
-    js, _ := json.Marshal(&s)
+    core.App.DB.Model(&s).Related(&a)
+
+    js, _ := json.Marshal(&core.SubjectResponse{Subject: s, Audits: a})
 
     core.WriteResponseHeader(w, 200)
     w.Write(js)

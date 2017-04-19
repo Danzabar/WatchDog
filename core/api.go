@@ -22,3 +22,8 @@ func (r *RestResponse) Serialize() []byte {
 
     return str
 }
+
+type SubjectResponse struct {
+    Subject Subject `json:"subject"`
+    Audits  []Audit `json:"audits"`
+}

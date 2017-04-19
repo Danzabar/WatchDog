@@ -14,12 +14,10 @@ func Watch() {
 
     for _, v := range s {
         core.App.Log.Debugf("Checking %s", v.Domain)
-        go func() {
-            a := CheckStatus(v, &core.Audit{Subject: v})
-            core.App.DB.Save(a)
-            core.App.DB.Model(v).Association("Audits").Append(a)
-            core.App.Log.Debugf("Checked %s", v.Domain)
-        }()
+        a := CheckStatus(v, &core.Audit{SubjectId: v.Model.ID})
+        core.App.DB.Save(a)
+        core.App.DB.Model(&v).Association("Audits").Append(a)
+        core.App.Log.Debugf("Checked %s", v.Domain)
     }
 }
 
@@ -34,6 +32,11 @@ func CheckStatus(s core.Subject, a *core.Audit) *core.Audit {
     }
 
     resp, err := http.DefaultClient.Do(req)
+
+    if err != nil {
+        core.App.Log.Error(err)
+        return a
+    }
 
     if resp.StatusCode == http.StatusOK {
         a.Result = true

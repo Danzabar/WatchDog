@@ -14,7 +14,8 @@ type Model struct {
 // An audit represents a single check
 type Audit struct {
     Model
-    Subject      Subject `json:"subject"`
+    SubjectId    uint    `json:"-"`
+    Subject      Subject `json:"-"`
     Result       bool    `json:"result"`
     ResponseTime int     `json:"responseTime"`
 }
