@@ -10,7 +10,7 @@ var (
 )
 
 func Setup() {
-    fs := pongo2.MustNewLocalFileSystemLoader("site/templates/")
+    fs := pongo2.MustNewLocalFileSystemLoader("templates/")
     Template = pongo2.NewSet("Templates", fs)
 
     // Ping route for AWS Cloudwatch
@@ -23,4 +23,8 @@ func Setup() {
     core.App.Router.HandleFunc("/api/v1/subject", GetSubjects).Methods("GET")
     core.App.Router.HandleFunc("/api/v1/subject/{id}", GetSubjectDetails).Methods("GET")
     core.App.Router.HandleFunc("/api/v1/subject", PostSubject).Methods("POST")
+}
+
+func Migrate() {
+    core.App.DB.AutoMigrate(&core.Audit{}, &core.Subject{})
 }

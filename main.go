@@ -39,6 +39,6 @@ func main() {
 
 func Migrate() {
     core.App.Log.Debug("Starting Migrations")
-    core.App.DB.AutoMigrate(&core.Audit{}, &core.Subject{})
+    site.Migrate()
     core.App.Log.Debug("Finished Migrations")
 }
