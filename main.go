@@ -4,6 +4,8 @@ import (
     "flag"
     "github.com/Danzabar/WatchDog/core"
     "github.com/Danzabar/WatchDog/site"
+    "github.com/Danzabar/WatchDog/watcher"
+    "github.com/jasonlvhit/gocron"
 )
 
 func main() {
@@ -24,6 +26,8 @@ func main() {
     }
 
     if *r {
+        gocron.Every(1).Minute().Do(watcher.Watch)
+        gocron.Start()
         core.App.Run()
     }
 }
