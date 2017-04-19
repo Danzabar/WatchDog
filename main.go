@@ -32,4 +32,9 @@ func main() {
     }
 }
 
-func Migrate() {}
+func Migrate() {
+    core.App.Log.Debug("Starting Migrations")
+    core.App.DB.AutoMigrate(&core.Subject{})
+    core.App.DB.AutoMigrate(&core.Audit{})
+    core.App.Log.Debug("Finished Migrations")
+}

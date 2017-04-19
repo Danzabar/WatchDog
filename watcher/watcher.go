@@ -1,27 +1,32 @@
 package watcher
 
 import (
+    "fmt"
     "github.com/Danzabar/WatchDog/core"
     "net/http"
 )
 
 func Watch() {
-    core.App.Log.Debug("Watching!")
-}
+    var s []core.Subject
 
-// Interface for "Probes" this
-// could be a SOAP client or HTTP Client etc
-type Probe interface {
-    CheckStatus(s core.Subject, a core.Audit) core.Audit
-}
+    core.App.Log.Debug("Starting watcher...")
+    core.App.DB.Find(&s)
 
-// HTTP Probe struct
-type HttpProbe struct{}
+    for _, v := range s {
+        core.App.Log.Debugf("Checking %s", v.Domain)
+        go func() {
+            a := CheckStatus(v, &core.Audit{Subject: v})
+            core.App.DB.Save(a)
+            core.App.DB.Model(v).Association("Audits").Append(a)
+            core.App.Log.Debugf("Checked %s", v.Domain)
+        }()
+    }
+}
 
 // Checks the Status of a service/website using a HTTP "ping"
-func (h *HttpProbe) CheckStatus(s core.Subject, a core.Audit) core.Audit {
-    a.Status = false
-    req, err := http.NewRequest("GET", fmt.Sprintf("%s/%s", s.Endpoint, s.PingURI), nil)
+func CheckStatus(s core.Subject, a *core.Audit) *core.Audit {
+    a.Result = false
+    req, err := http.NewRequest("GET", fmt.Sprintf("%s/%s", s.Domain, s.PingURI), nil)
 
     if err != nil {
         core.App.Log.Error(err)
@@ -31,8 +36,7 @@ func (h *HttpProbe) CheckStatus(s core.Subject, a core.Audit) core.Audit {
     resp, err := http.DefaultClient.Do(req)
 
     if resp.StatusCode == http.StatusOK {
-        a.Status = true
-
+        a.Result = true
     }
 
     return a

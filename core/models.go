@@ -11,24 +11,24 @@ type Model struct {
     UpdatedAt time.Time `json:"updatedAt"`
 }
 
-// A Subject represents a service or website
-type Subject struct {
-    Model
-    Domain  string  `json:"domain"`
-    PingURI string  `json:"ping"`
-    ExtId   string  `json:"extId"`
-    Status  string  `json:"status"`
-    Audits  []Audit `json:"audits"`
-}
-
-func (s *Subject) BeforeCreate() {
-    s.ExtId, _ = shortid.Generate()
-}
-
 // An audit represents a single check
 type Audit struct {
     Model
     Subject      Subject `json:"subject"`
     Result       bool    `json:"result"`
     ResponseTime int     `json:"responseTime"`
+}
+
+// A Subject represents a service or website
+type Subject struct {
+    Model
+    Audits  []Audit `json:"audits,omitempty"`
+    Domain  string  `json:"domain"`
+    PingURI string  `json:"ping"`
+    ExtId   string  `json:"extId"`
+    Status  string  `json:"status"`
+}
+
+func (s *Subject) BeforeCreate() {
+    s.ExtId, _ = shortid.Generate()
 }
