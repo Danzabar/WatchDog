@@ -15,7 +15,7 @@ var (
 
 func init() {
     core.NewApp(":3000", "sqlite3", "/tmp/test.db")
-    Setup()
+    Setup("templates/")
 
     Migrate()
     server = httptest.NewServer(core.App.Router)

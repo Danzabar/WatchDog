@@ -20,7 +20,7 @@ func main() {
 
     core.NewApp(*p, *dd, *dc)
 
-    site.Setup()
+    site.Setup("site/templates/")
 
     if *m {
         Migrate()

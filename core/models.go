@@ -17,7 +17,8 @@ type Audit struct {
     SubjectId    uint    `json:"-"`
     Subject      Subject `json:"-"`
     Result       bool    `json:"result"`
-    ResponseTime int     `json:"responseTime"`
+    ResponseTime float64 `json:"responseTime"`
+    Status       string  `json:"status"`
 }
 
 // A Subject represents a service or website

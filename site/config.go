@@ -9,8 +9,8 @@ var (
     Template *pongo2.TemplateSet
 )
 
-func Setup() {
-    fs := pongo2.MustNewLocalFileSystemLoader("templates/")
+func Setup(d string) {
+    fs := pongo2.MustNewLocalFileSystemLoader(d)
     Template = pongo2.NewSet("Templates", fs)
 
     // Ping route for AWS Cloudwatch
