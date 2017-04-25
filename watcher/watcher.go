@@ -55,12 +55,10 @@ func AnalyseStatus(a *core.Audit, s core.Subject) string {
         return CRITICAL
     }
 
-    // Why 2? I don't really know, but 2 seconds seems
-    // like a long time for a ping endpoint
-    if a.ResponseTime > 2 {
+    if a.ResponseTime > s.ResponseLimit {
         // Degredation? Yes please
         Shout.SendAlert(
-            fmt.Sprintf("%s domain has entered degredated status", s.Domain),
+            fmt.Sprintf("%s domain has entered degredated status - response time was %d", s.Domain),
             fmt.Sprintf("DEGREDATION: %s", s.Name),
         )
         return DEGREDATED

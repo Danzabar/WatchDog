@@ -66,5 +66,7 @@ func PostSubject(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    core.WriteResponseHeader(w, 202)
+    js, _ := json.Marshal(&s)
+    core.WriteResponseHeader(w, 200)
+    w.Write(js)
 }

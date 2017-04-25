@@ -25,14 +25,19 @@ type Audit struct {
 // A Subject represents a service or website
 type Subject struct {
     Model
-    Audits  []Audit `json:"audits,omitempty"`
-    Name    string  `json:"name"`
-    Domain  string  `json:"domain"`
-    PingURI string  `json:"ping"`
-    ExtId   string  `json:"extId"`
-    Status  string  `json:"status"`
+    Audits        []Audit `json:"audits,omitempty"`
+    Name          string  `json:"name"`
+    Domain        string  `json:"domain"`
+    PingURI       string  `json:"ping"`
+    ExtId         string  `json:"extId"`
+    Status        string  `json:"status"`
+    ResponseLimit float64 `json:"responseLimit"`
 }
 
 func (s *Subject) BeforeCreate() {
     s.ExtId, _ = shortid.Generate()
+
+    if s.ResponseLimit == 0 {
+        s.ResponseLimit = 2
+    }
 }
