@@ -14,17 +14,19 @@ type Model struct {
 // An audit represents a single check
 type Audit struct {
     Model
-    SubjectId    uint    `json:"-"`
-    Subject      Subject `json:"-"`
-    Result       bool    `json:"result"`
-    ResponseTime float64 `json:"responseTime"`
-    Status       string  `json:"status"`
+    SubjectId      uint    `json:"-"`
+    Subject        Subject `json:"-"`
+    Result         bool    `json:"result"`
+    ResponseTime   float64 `json:"responseTime"`
+    ResponseStatus int     `json:"responseStatus"`
+    Status         string  `json:"status"`
 }
 
 // A Subject represents a service or website
 type Subject struct {
     Model
     Audits  []Audit `json:"audits,omitempty"`
+    Name    string  `json:"name"`
     Domain  string  `json:"domain"`
     PingURI string  `json:"ping"`
     ExtId   string  `json:"extId"`

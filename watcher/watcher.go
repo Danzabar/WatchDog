@@ -33,35 +33,35 @@ func Watch() {
     core.App.DB.Find(&s)
 
     for _, v := range s {
-        core.App.Log.Debugf("Checking %s", v.Domain)
+        core.App.Log.Debugf("Checking %s", v.Name)
 
         a := CheckStatus(v, &core.Audit{SubjectId: v.Model.ID})
-        a.Status = AnalyseStatus(a.Result, a.ResponseTime, v)
+        a.Status = AnalyseStatus(a, v)
         v.Status = a.Status
 
         core.App.DB.Save(a)
         core.App.DB.Save(&v)
-        core.App.Log.Debugf("Checked %s", v.Domain)
+        core.App.Log.Debugf("Checked %s", v.Name)
     }
 }
 
-func AnalyseStatus(r bool, t float64, s core.Subject) string {
-    if !r {
+func AnalyseStatus(a *core.Audit, s core.Subject) string {
+    if !a.Result {
         // If we go to critical, we want an alert for this
         Shout.SendAlert(
-            fmt.Sprintf("%s domain has entered critical status", s.Domain),
-            fmt.Sprintf("CRITICAL: %s", s.Domain),
+            fmt.Sprintf("%s domain has entered critical status - server responded with a status of %d", s.Domain, a.ResponseStatus),
+            fmt.Sprintf("CRITICAL: %s", s.Name),
         )
         return CRITICAL
     }
 
     // Why 2? I don't really know, but 2 seconds seems
     // like a long time for a ping endpoint
-    if t > 2 {
+    if a.ResponseTime > 2 {
         // Degredation? Yes please
         Shout.SendAlert(
             fmt.Sprintf("%s domain has entered degredated status", s.Domain),
-            fmt.Sprintf("DEGREDATION: %s", s.Domain),
+            fmt.Sprintf("DEGREDATION: %s", s.Name),
         )
         return DEGREDATED
     }
@@ -71,7 +71,7 @@ func AnalyseStatus(r bool, t float64, s core.Subject) string {
     if s.Status != OK {
         Shout.SendAlert(
             fmt.Sprintf("%s domain is now running OK", s.Domain),
-            fmt.Sprintf("OK: %s", s.Domain),
+            fmt.Sprintf("OK: %s", s.Name),
         )
     }
 
@@ -96,6 +96,8 @@ func CheckStatus(s core.Subject, a *core.Audit) *core.Audit {
         a.ResponseTime = time.Since(ts).Seconds()
         return a
     }
+
+    a.ResponseStatus = resp.StatusCode
 
     if resp.StatusCode == http.StatusOK {
         a.Result = true

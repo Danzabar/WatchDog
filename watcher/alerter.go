@@ -33,7 +33,6 @@ func NewPushBullet() *PushBullet {
 }
 
 func (p *PushBullet) SendAlert(msg string, t string) {
-    core.App.Log.Debug("Pushing some shiz")
     n := requests.NewNote()
     n.Title = t
     n.Body = msg

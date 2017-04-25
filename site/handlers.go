@@ -3,6 +3,7 @@ package site
 import (
     "encoding/json"
     "github.com/Danzabar/WatchDog/core"
+    "github.com/flosch/pongo2"
     "github.com/gorilla/mux"
     "net/http"
 )
@@ -12,9 +13,9 @@ func Ping(w http.ResponseWriter, r *http.Request) {
     w.Write([]byte(`Pong`))
 }
 
-// [GET] /status
+// [GET] /
 func GetStatsPage(w http.ResponseWriter, r *http.Request) {
-
+    Render("stats.html", w, pongo2.Context{})
 }
 
 // [GET] /api/v1/subject
@@ -43,7 +44,7 @@ func GetSubjectDetails(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    core.App.DB.Model(&s).Related(&a)
+    core.App.DB.Where("subject_id = ?", s.Model.ID).Limit(50).Order("created_at DESC").Find(&a)
 
     js, _ := json.Marshal(&core.SubjectResponse{Subject: s, Audits: a})
 
