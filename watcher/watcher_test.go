@@ -19,7 +19,7 @@ func RouteForSuccess(w http.ResponseWriter, r *http.Request) {
 }
 
 func init() {
-    core.NewApp(":3000", "sqlite3", "/tmp/test.db")
+    core.NewApp(":3000", "sqlite3", "/tmp/test.db", true)
     site.Setup("../site/templates")
 
     site.Migrate()

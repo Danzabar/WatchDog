@@ -1,5 +1,37 @@
 {% extends "base.html" %}
 
 {% block content %}
-<p>test</p>
+{% verbatim %}
+<div id="status">
+    <div class="uk-card uk-card-default uk-card-body uk-width-1-2@m" v-for="subject in subjects">
+        <h3 class="uk-card-title">{{ subject.name }}</h3>
+        <p>{{ subject.domain }}</p>
+        <p>{{ subject.status }}</p>
+    </div>
+</div>
+{% endverbatim %}
+<script>
+const status = new Vue({
+    el: "#status",
+    data: {
+        subjects: []
+    },
+    mounted: function() {
+        this.fetchSubjects()
+    },
+    methods: {
+        fetchSubjects: function() {
+            axios.get("/api/v1/subject")
+            .then(r => {
+                if (r.status === 200) {
+                    this.subjects = r.data
+                }
+            })
+            .catch(e => {
+                console.log(e)
+            })
+        }
+    }
+})
+</script>
 {% endblock %}

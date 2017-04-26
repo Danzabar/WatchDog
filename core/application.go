@@ -21,10 +21,11 @@ type Application struct {
     DB     *gorm.DB
     Router *mux.Router
     Log    *logging.Logger
-    port   string
+    Alerts bool
+    Port   string
 }
 
-func NewApp(port string, dbDriver string, dbCreds string) {
+func NewApp(port string, dbDriver string, dbCreds string, alerts bool) {
     db, _ := gorm.Open(dbDriver, dbCreds)
     SetLogging()
 
@@ -32,7 +33,8 @@ func NewApp(port string, dbDriver string, dbCreds string) {
         DB:     db,
         Router: mux.NewRouter(),
         Log:    logging.MustGetLogger("scribe"),
-        port:   port,
+        Port:   port,
+        Alerts: alerts,
     }
 }
 
@@ -49,6 +51,6 @@ func SetLogging() {
 
 func (a *Application) Run() {
     http.Handle("/", a.Router)
-    a.Log.Debugf("Running app on " + a.port)
-    a.Log.Critical(http.ListenAndServe(a.port, nil))
+    a.Log.Debugf("Running app on " + a.Port)
+    a.Log.Critical(http.ListenAndServe(a.Port, nil))
 }

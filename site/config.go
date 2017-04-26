@@ -24,6 +24,11 @@ func Setup(d string) {
     core.App.Router.HandleFunc("/api/v1/subject", GetSubjects).Methods("GET")
     core.App.Router.HandleFunc("/api/v1/subject/{id}", GetSubjectDetails).Methods("GET")
     core.App.Router.HandleFunc("/api/v1/subject", PostSubject).Methods("POST")
+
+    // Assets
+    core.App.Router.
+        PathPrefix("/").
+        Handler(http.StripPrefix("/", http.FileServer(http.Dir("site/assets/"))))
 }
 
 func Migrate() {

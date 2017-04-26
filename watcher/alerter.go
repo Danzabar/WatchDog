@@ -33,6 +33,12 @@ func NewPushBullet() *PushBullet {
 }
 
 func (p *PushBullet) SendAlert(msg string, t string) {
+    // If alerting has been switched off, don't bother sending these
+    if !core.App.Alerts {
+        core.App.Log.Debug("Alerts disabled, skipped send")
+        return
+    }
+
     n := requests.NewNote()
     n.Title = t
     n.Body = msg

@@ -14,7 +14,7 @@ var (
 )
 
 func init() {
-    core.NewApp(":3000", "sqlite3", "/tmp/test.db")
+    core.NewApp(":3000", "sqlite3", "/tmp/test.db", false)
     Setup("templates/")
 
     Migrate()

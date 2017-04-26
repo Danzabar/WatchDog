@@ -16,10 +16,11 @@ func main() {
     dc := flag.String("creds", "/tmp/main.db", "The database credentials")
     p := flag.String("port", ":8080", "The port on which this listens")
     w := flag.Bool("w", false, "Performs a watch operation on load if set")
+    n := flag.Bool("n", true, "When set to true, enables alerts, otherwise bypasses them")
 
     flag.Parse()
 
-    core.NewApp(*p, *dd, *dc)
+    core.NewApp(*p, *dd, *dc, *n)
 
     site.Setup("site/templates/")
 
