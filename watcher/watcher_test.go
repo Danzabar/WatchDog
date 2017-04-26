@@ -18,10 +18,6 @@ func RouteForSuccess(w http.ResponseWriter, r *http.Request) {
     core.WriteResponseHeader(w, 200)
 }
 
-func RouteForDegredation(w http.ResponseWriter, r *http.Request) {
-    core.WriteResponseHeader(w, 404)
-}
-
 func init() {
     core.NewApp(":3000", "sqlite3", "/tmp/test.db")
     site.Setup("../site/templates")
@@ -30,7 +26,6 @@ func init() {
 
     // Add test routes
     core.App.Router.HandleFunc("/test/success", RouteForSuccess)
-    core.App.Router.HandleFunc("/test/degredation", RouteForDegredation)
 
     server = httptest.NewServer(core.App.Router)
 
@@ -56,4 +51,40 @@ func TestWatchWithSuccessSubject(t *testing.T) {
     core.App.DB.Where("ext_id = ?", s.ExtId).Find(&o)
 
     assert.Equal(t, OK, o.Status)
+}
+
+func TestWatchWithDegredation(t *testing.T) {
+    s := &core.Subject{
+        Domain:        server.URL,
+        PingURI:       "/test/success",
+        ResponseLimit: 0.00001,
+        Name:          "TestDeg",
+    }
+
+    core.App.DB.Create(s)
+
+    Watch()
+
+    var o core.Subject
+    core.App.DB.Where("ext_id = ?", s.ExtId).Find(&o)
+
+    assert.Equal(t, DEGREDATED, o.Status)
+}
+
+func TestWatchWithCritical(t *testing.T) {
+    s := &core.Subject{
+        Domain:        server.URL,
+        PingURI:       "/test/fakse",
+        ResponseLimit: 5,
+        Name:          "TestDeg",
+    }
+
+    core.App.DB.Create(s)
+
+    Watch()
+
+    var o core.Subject
+    core.App.DB.Where("ext_id = ?", s.ExtId).Find(&o)
+
+    assert.Equal(t, CRITICAL, o.Status)
 }
