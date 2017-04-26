@@ -35,7 +35,7 @@ func TestPingIsOk(t *testing.T) {
 
 // Test that we get a 200 from stats
 func TestStatsIsOk(t *testing.T) {
-    req, _ := http.NewRequest("GET", fmt.Sprintf("%s/status", server.URL), nil)
+    req, _ := http.NewRequest("GET", fmt.Sprintf("%s", server.URL), nil)
     resp, err := http.DefaultClient.Do(req)
 
     if err != nil {
