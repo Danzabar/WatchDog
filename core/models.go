@@ -20,6 +20,9 @@ type Audit struct {
     ResponseTime   float64 `json:"responseTime"`
     ResponseStatus int     `json:"responseStatus"`
     Status         string  `json:"status"`
+    Uptime         uint64  `json:"uptime"`
+    CPU            float64 `json:"cpu"`
+    Memory         float64 `json:"memory"`
 }
 
 // A Subject represents a service or website
@@ -32,6 +35,9 @@ type Subject struct {
     ExtId         string  `json:"extId"`
     Status        string  `json:"status"`
     ResponseLimit float64 `json:"responseLimit"`
+    Advanced      bool    `json:"advanced"`
+    Hostname      string  `json:"host"`
+    OS            string  `json:"os"`
 }
 
 func (s *Subject) BeforeCreate() {
