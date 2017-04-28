@@ -15,7 +15,6 @@ type Model struct {
 type Audit struct {
     Model
     SubjectId      uint    `json:"-"`
-    Subject        Subject `json:"-"`
     Result         bool    `json:"result"`
     ResponseTime   float64 `json:"responseTime"`
     ResponseStatus int     `json:"responseStatus"`
@@ -38,6 +37,7 @@ type Subject struct {
     Advanced      bool    `json:"advanced"`
     Hostname      string  `json:"host"`
     OS            string  `json:"os"`
+    Platform      string  `json:"platform"`
 }
 
 func (s *Subject) BeforeCreate() {

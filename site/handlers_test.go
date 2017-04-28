@@ -21,18 +21,6 @@ func init() {
     server = httptest.NewServer(core.App.Router)
 }
 
-// Test that the Ping endpoint works
-func TestPingIsOk(t *testing.T) {
-    req, _ := http.NewRequest("GET", fmt.Sprintf("%s/ping", server.URL), nil)
-    resp, err := http.DefaultClient.Do(req)
-
-    if err != nil {
-        t.Fatal(err)
-    }
-
-    assert.Equal(t, http.StatusOK, resp.StatusCode)
-}
-
 // Test that we get a 200 from stats
 func TestStatsIsOk(t *testing.T) {
     req, _ := http.NewRequest("GET", fmt.Sprintf("%s", server.URL), nil)

@@ -1,8 +1,10 @@
 package watcher
 
 import (
+    "encoding/json"
     "fmt"
     "github.com/Danzabar/WatchDog/core"
+    "github.com/Danzabar/WatchDog/plugins"
     "net/http"
     "time"
 )
@@ -95,12 +97,49 @@ func CheckStatus(s core.Subject, a *core.Audit) *core.Audit {
         return a
     }
 
-    a.ResponseStatus = resp.StatusCode
+    core.App.Log.Debugf("%d", resp.StatusCode)
 
     if resp.StatusCode == http.StatusOK {
         a.Result = true
         a.ResponseTime = time.Since(ts).Seconds()
     }
+
+    if s.Advanced {
+        return CheckAdvancedStatus(s, a, resp)
+    } else {
+        return CheckBasicStatus(s, a, resp)
+    }
+}
+
+// Checks the basics, this is for endpoints that do not provide
+// the detailed response specified in plugins/health.go
+func CheckBasicStatus(s core.Subject, a *core.Audit, r *http.Response) *core.Audit {
+    a.ResponseStatus = r.StatusCode
+    return a
+}
+
+// This expects a more detailed response, check plugins/health.go for
+// more information on what this expects
+func CheckAdvancedStatus(s core.Subject, a *core.Audit, r *http.Response) *core.Audit {
+    var h plugins.HealthCheckResponse
+
+    if err := json.NewDecoder(r.Body).Decode(&h); err != nil {
+        core.App.Log.Errorf("Invalid json provided for %s - Checking using basic rules", s.Name)
+        return CheckBasicStatus(s, a, r)
+    }
+
+    // Set vars
+    s.Hostname = h.Host
+    s.OS = h.OS
+    s.Platform = h.Platform
+
+    core.App.DB.Save(&s)
+
+    // Audit vars
+    a.CPU = h.CPU
+    a.Uptime = h.Uptime
+    a.Memory = h.Memory
+    a.ResponseStatus = r.StatusCode
 
     return a
 }
