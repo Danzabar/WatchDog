@@ -97,8 +97,6 @@ func CheckStatus(s core.Subject, a *core.Audit) *core.Audit {
         return a
     }
 
-    core.App.Log.Debugf("%d", resp.StatusCode)
-
     if resp.StatusCode == http.StatusOK {
         a.Result = true
         a.ResponseTime = time.Since(ts).Seconds()
