@@ -38,8 +38,8 @@ type Subject struct {
     Hostname      string  `json:"host"`
     OS            string  `json:"os"`
     Platform      string  `json:"platform"`
-    User          string  `json:"user"`
-    Pass          string  `json:"pass"`
+    User          string  `json:"-"`
+    Pass          string  `json:"-"`
 }
 
 func (s *Subject) BeforeCreate() {
