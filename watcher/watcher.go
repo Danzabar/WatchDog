@@ -83,6 +83,7 @@ func CheckStatus(s core.Subject, a *core.Audit) *core.Audit {
     a.Result = false
     ts := time.Now()
     req, err := http.NewRequest("GET", fmt.Sprintf("%s%s", s.Domain, s.PingURI), nil)
+    req.SetBasicAuth(s.User, s.Pass)
 
     if err != nil {
         core.App.Log.Error(err)
