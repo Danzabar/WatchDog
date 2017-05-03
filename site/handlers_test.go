@@ -32,14 +32,3 @@ func TestStatsIsOk(t *testing.T) {
 
     assert.Equal(t, http.StatusOK, resp.StatusCode)
 }
-
-func TestGetSubjects(t *testing.T) {
-    req, _ := http.NewRequest("GET", fmt.Sprintf("%s/api/v1/subject", server.URL), nil)
-    resp, err := http.DefaultClient.Do(req)
-
-    if err != nil {
-        t.Fatal(err)
-    }
-
-    assert.Equal(t, http.StatusOK, resp.StatusCode)
-}

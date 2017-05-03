@@ -18,11 +18,6 @@ func Setup(d string) {
     // Route for stats/status page
     core.App.Router.HandleFunc("/", GetStatsPage).Methods("GET")
 
-    // API
-    core.App.Router.HandleFunc("/api/v1/subject", GetSubjects).Methods("GET")
-    core.App.Router.HandleFunc("/api/v1/subject/{id}", GetSubjectDetails).Methods("GET")
-    core.App.Router.HandleFunc("/api/v1/subject", PostSubject).Methods("POST")
-
     // HealthCheck
     core.App.Router.HandleFunc("/health", plugins.HealthCheckHandler).Methods("GET")
 

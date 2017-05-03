@@ -3,6 +3,7 @@ package main
 import (
     "flag"
     "fmt"
+    "github.com/Danzabar/WatchDog/api"
     "github.com/Danzabar/WatchDog/core"
     "github.com/Danzabar/WatchDog/site"
     "github.com/Danzabar/WatchDog/watcher"
@@ -22,6 +23,7 @@ func main() {
 
     core.NewApp(*p, *dd, *dc, *n)
 
+    api.Setup()
     site.Setup("site/templates/")
 
     fmt.Print(`
