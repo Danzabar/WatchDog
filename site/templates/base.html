@@ -10,6 +10,12 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.22/js/uikit.min.js"></script>
         <script src="/scripts/axios.min.js"></script>
         <script src="/scripts/vue.js"></script>
+        <script src="/scripts/moment.js"></script>
+        <script>
+        Vue.filter('date', function(v) {
+                return moment(v).fromNow()
+            })
+        </script>
         {% block scripts %}{% endblock %}
     </head>
     <body>
