@@ -36,13 +36,7 @@ func Watch() {
 
     for _, v := range s {
         core.App.Log.Debugf("Checking %s", v.Name)
-
-        a := CheckStatus(v, &core.Audit{SubjectId: v.Model.ID})
-        a.Status = AnalyseStatus(a, v)
-        v.Status = a.Status
-
-        core.App.DB.Save(a)
-        core.App.DB.Save(&v)
+        CheckStatus(v, &core.Audit{SubjectId: v.Model.ID})
         core.App.Log.Debugf("Checked %s", v.Name)
     }
 }
@@ -78,8 +72,16 @@ func AnalyseStatus(a *core.Audit, s core.Subject) string {
     return OK
 }
 
+func UpdateEntities(a *core.Audit, s core.Subject) {
+    a.Status = AnalyseStatus(a, s)
+    s.Status = a.Status
+
+    core.App.DB.Save(a)
+    core.App.DB.Save(&s)
+}
+
 // Checks the Status of a service/website using a HTTP "ping"
-func CheckStatus(s core.Subject, a *core.Audit) *core.Audit {
+func CheckStatus(s core.Subject, a *core.Audit) {
     a.Result = false
     ts := time.Now()
     req, err := http.NewRequest("GET", fmt.Sprintf("%s%s", s.Domain, s.PingURI), nil)
@@ -87,7 +89,7 @@ func CheckStatus(s core.Subject, a *core.Audit) *core.Audit {
 
     if err != nil {
         core.App.Log.Error(err)
-        return a
+        return
     }
 
     resp, err := HttpClient.Do(req)
@@ -95,7 +97,7 @@ func CheckStatus(s core.Subject, a *core.Audit) *core.Audit {
     if err != nil {
         core.App.Log.Error(err)
         a.ResponseTime = time.Since(ts).Seconds()
-        return a
+        return
     }
 
     if resp.StatusCode == http.StatusOK {
@@ -104,27 +106,28 @@ func CheckStatus(s core.Subject, a *core.Audit) *core.Audit {
     }
 
     if s.Advanced {
-        return CheckAdvancedStatus(s, a, resp)
+        CheckAdvancedStatus(s, a, resp)
     } else {
-        return CheckBasicStatus(s, a, resp)
+        CheckBasicStatus(s, a, resp)
     }
 }
 
 // Checks the basics, this is for endpoints that do not provide
 // the detailed response specified in plugins/health.go
-func CheckBasicStatus(s core.Subject, a *core.Audit, r *http.Response) *core.Audit {
+func CheckBasicStatus(s core.Subject, a *core.Audit, r *http.Response) {
     a.ResponseStatus = r.StatusCode
-    return a
+    UpdateEntities(a, s)
 }
 
 // This expects a more detailed response, check plugins/health.go for
 // more information on what this expects
-func CheckAdvancedStatus(s core.Subject, a *core.Audit, r *http.Response) *core.Audit {
+func CheckAdvancedStatus(s core.Subject, a *core.Audit, r *http.Response) {
     var h plugins.HealthCheckResponse
 
     if err := json.NewDecoder(r.Body).Decode(&h); err != nil {
         core.App.Log.Errorf("Invalid json provided for %s - Checking using basic rules", s.Name)
-        return CheckBasicStatus(s, a, r)
+        CheckBasicStatus(s, a, r)
+        return
     }
 
     // Set vars
@@ -132,13 +135,11 @@ func CheckAdvancedStatus(s core.Subject, a *core.Audit, r *http.Response) *core.
     s.OS = h.OS
     s.Platform = h.Platform
 
-    core.App.DB.Save(&s)
-
     // Audit vars
     a.CPU = h.CPU
     a.Uptime = h.Uptime
     a.Memory = h.Memory
     a.ResponseStatus = r.StatusCode
 
-    return a
+    UpdateEntities(a, s)
 }
