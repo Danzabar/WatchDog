@@ -48,3 +48,39 @@ func TestPostSubjectBadJson(t *testing.T) {
 
     assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 }
+
+func TestGetSubject(t *testing.T) {
+    req, _ := http.NewRequest("GET", fmt.Sprintf("%s/api/v1/subject", server.URL), nil)
+    resp, err := http.DefaultClient.Do(req)
+
+    if err != nil {
+        t.Fatal(err)
+    }
+
+    assert.Equal(t, http.StatusOK, resp.StatusCode)
+}
+
+func TestGetSingleSubjectSuccess(t *testing.T) {
+    s := &core.Subject{Name: "Test"}
+    core.App.DB.Save(s)
+
+    req, _ := http.NewRequest("GET", fmt.Sprintf("%s/api/v1/subject/%s", server.URL, s.ExtId), nil)
+    resp, err := http.DefaultClient.Do(req)
+
+    if err != nil {
+        t.Fatal(err)
+    }
+
+    assert.Equal(t, http.StatusOK, resp.StatusCode)
+}
+
+func TestGetSingeSubjectNotFound(t *testing.T) {
+    req, _ := http.NewRequest("GET", fmt.Sprintf("%s/api/v1/subject/test", server.URL), nil)
+    resp, err := http.DefaultClient.Do(req)
+
+    if err != nil {
+        t.Fatal(err)
+    }
+
+    assert.Equal(t, http.StatusNotFound, resp.StatusCode)
+}
