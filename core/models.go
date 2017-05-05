@@ -28,9 +28,9 @@ type Audit struct {
 type Subject struct {
     Model
     Audits        []Audit `json:"audits,omitempty"`
-    Name          string  `json:"name"`
-    Domain        string  `json:"domain"`
-    PingURI       string  `json:"ping"`
+    Name          string  `json:"name" gorm:"unique" validate:"required"`
+    Domain        string  `json:"domain" validate:"required"`
+    PingURI       string  `json:"ping" validate:"required"`
     ExtId         string  `json:"extId"`
     Status        string  `json:"status"`
     ResponseLimit float64 `json:"responseLimit"`
