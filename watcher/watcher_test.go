@@ -4,8 +4,10 @@ import (
     "github.com/Danzabar/WatchDog/core"
     "github.com/Danzabar/WatchDog/site"
     "github.com/stretchr/testify/assert"
+    "net/http"
     "net/http/httptest"
     "testing"
+    "time"
 )
 
 var (
@@ -108,4 +110,31 @@ func TestAdvancedHealthEndpoint(t *testing.T) {
     assert.Equal(t, OK, o.Status)
     assert.NotEqual(t, 0, o.Audits[0].Memory)
     assert.NotEqual(t, 0, o.Audits[0].CPU)
+}
+
+func TestFailToConnectDuringTest(t *testing.T) {
+    clear()
+    s := &core.Subject{
+        Domain:        "http://rand.rand",
+        PingURI:       "/health",
+        ResponseLimit: 5,
+        Name:          "TestFailure",
+        Advanced:      false,
+    }
+
+    core.App.DB.Create(s)
+
+    // Update the HTTPClient, 10 seconds is nuts for a test
+    HttpClient = http.Client{
+        Timeout: time.Duration(1 * time.Second),
+    }
+
+    Watch()
+
+    var o core.Subject
+
+    core.App.DB.Where("ext_id = ?", s.ExtId).Preload("Audits").Find(&o)
+
+    assert.Equal(t, CRITICAL, o.Status)
+    assert.Equal(t, CRITICAL, o.Audits[0].Status)
 }

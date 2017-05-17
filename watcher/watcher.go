@@ -97,26 +97,28 @@ func CheckStatus(s core.Subject, a *core.Audit) {
     if err != nil {
         core.App.Log.Error(err)
         a.ResponseTime = time.Since(ts).Seconds()
+        UpdateEntities(a, s)
         return
     }
 
     if resp.StatusCode == http.StatusOK {
         a.Result = true
         a.ResponseTime = time.Since(ts).Seconds()
+
+        if s.Advanced {
+            CheckAdvancedStatus(s, a, resp)
+        } else {
+            CheckBasicStatus(s, a, resp)
+        }
     }
 
-    if s.Advanced {
-        CheckAdvancedStatus(s, a, resp)
-    } else {
-        CheckBasicStatus(s, a, resp)
-    }
+    UpdateEntities(a, s)
 }
 
 // Checks the basics, this is for endpoints that do not provide
 // the detailed response specified in plugins/health.go
 func CheckBasicStatus(s core.Subject, a *core.Audit, r *http.Response) {
     a.ResponseStatus = r.StatusCode
-    UpdateEntities(a, s)
 }
 
 // This expects a more detailed response, check plugins/health.go for
@@ -140,6 +142,4 @@ func CheckAdvancedStatus(s core.Subject, a *core.Audit, r *http.Response) {
     a.Uptime = h.Uptime
     a.Memory = h.Memory
     a.ResponseStatus = r.StatusCode
-
-    UpdateEntities(a, s)
 }
