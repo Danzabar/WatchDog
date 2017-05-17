@@ -25,5 +25,12 @@ func (r *RestResponse) Serialize() []byte {
 
 type SubjectResponse struct {
     Subject Subject `json:"subject"`
-    Audits  []Audit `json:"audits"`
+    Audits  []Audit `json:"audits,omitempty"`
+}
+
+func NewSubjectResponse(s Subject, a []Audit) ([]byte, error) {
+    s.User = ""
+    s.Pass = ""
+
+    return json.Marshal(&SubjectResponse{s, a})
 }

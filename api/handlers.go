@@ -39,7 +39,7 @@ func GetSubjectDetails(w http.ResponseWriter, r *http.Request) {
 
     core.App.DB.Where("subject_id = ?", s.Model.ID).Limit(p.Limit).Offset(p.Offset).Order("created_at DESC").Find(&a)
 
-    js, _ := json.Marshal(&core.SubjectResponse{Subject: s, Audits: a})
+    js, _ := core.NewSubjectResponse(s, a)
 
     core.WriteResponseHeader(w, 200)
     w.Write(js)
@@ -59,7 +59,7 @@ func PostSubject(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    js, _ := json.Marshal(&s)
+    js, _ := core.NewSubjectResponse(s, nil)
     core.WriteResponseHeader(w, 200)
     w.Write(js)
 }
