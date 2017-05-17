@@ -63,3 +63,17 @@ func PostSubject(w http.ResponseWriter, r *http.Request) {
     core.WriteResponseHeader(w, 200)
     w.Write(js)
 }
+
+// [DELETE] /api/v1/subject/{id}
+func DeleteSubject(w http.ResponseWriter, r *http.Request) {
+    var s core.Subject
+    params := mux.Vars(r)
+
+    if err := core.App.DB.Where("ext_id = ?", params["id"]).Find(&s).Error; err != nil {
+        core.WriteResponse(w, 404, core.RestResponse{Error: "Subject not found"})
+        return
+    }
+
+    core.App.DB.Delete(&s)
+    core.WriteResponseHeader(w, 200)
+}

@@ -8,6 +8,7 @@ import (
     _ "github.com/jinzhu/gorm/dialects/postgres"
     _ "github.com/jinzhu/gorm/dialects/sqlite"
     "github.com/op/go-logging"
+    "gopkg.in/go-playground/validator.v9"
     "net/http"
     "os"
 )
@@ -18,11 +19,12 @@ var App *Application
  * The Application Struct
  */
 type Application struct {
-    DB     *gorm.DB
-    Router *mux.Router
-    Log    *logging.Logger
-    Alerts bool
-    Port   string
+    DB        *gorm.DB
+    Router    *mux.Router
+    Log       *logging.Logger
+    Alerts    bool
+    Port      string
+    Validator *validator.Validate
 }
 
 func NewApp(port string, dbDriver string, dbCreds string, alerts bool) {
@@ -30,11 +32,12 @@ func NewApp(port string, dbDriver string, dbCreds string, alerts bool) {
     SetLogging()
 
     App = &Application{
-        DB:     db,
-        Router: mux.NewRouter(),
-        Log:    logging.MustGetLogger("scribe"),
-        Port:   port,
-        Alerts: alerts,
+        DB:        db,
+        Router:    mux.NewRouter(),
+        Log:       logging.MustGetLogger("scribe"),
+        Port:      port,
+        Alerts:    alerts,
+        Validator: validator.New(),
     }
 }
 
