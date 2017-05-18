@@ -60,6 +60,7 @@ func PostSubject(w http.ResponseWriter, r *http.Request) {
     }
 
     if err := core.App.DB.Save(&s).Error; err != nil {
+        core.App.Log.Error(err)
         core.WriteResponse(w, 422, core.RestResponse{Error: "Unable to save entity"})
         return
     }
