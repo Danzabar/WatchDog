@@ -1,6 +1,8 @@
 package core
 
 import (
+    "github.com/go-playground/locales/en"
+    ut "github.com/go-playground/universal-translator"
     "github.com/gorilla/mux"
     "github.com/jinzhu/gorm"
     _ "github.com/jinzhu/gorm/dialects/mssql"
@@ -9,6 +11,7 @@ import (
     _ "github.com/jinzhu/gorm/dialects/sqlite"
     "github.com/op/go-logging"
     "gopkg.in/go-playground/validator.v9"
+    translations "gopkg.in/go-playground/validator.v9/translations/en"
     "net/http"
     "os"
 )
@@ -19,12 +22,13 @@ var App *Application
  * The Application Struct
  */
 type Application struct {
-    DB        *gorm.DB
-    Router    *mux.Router
-    Log       *logging.Logger
-    Alerts    bool
-    Port      string
-    Validator *validator.Validate
+    DB         *gorm.DB
+    Router     *mux.Router
+    Log        *logging.Logger
+    Alerts     bool
+    Port       string
+    Validator  *validator.Validate
+    Translator ut.Translator
 }
 
 func NewApp(port string, dbDriver string, dbCreds string, alerts bool) {
@@ -32,13 +36,20 @@ func NewApp(port string, dbDriver string, dbCreds string, alerts bool) {
     SetLogging()
 
     App = &Application{
-        DB:        db,
-        Router:    mux.NewRouter(),
-        Log:       logging.MustGetLogger("scribe"),
-        Port:      port,
-        Alerts:    alerts,
-        Validator: validator.New(),
+        DB:     db,
+        Router: mux.NewRouter(),
+        Log:    logging.MustGetLogger("scribe"),
+        Port:   port,
+        Alerts: alerts,
     }
+
+    en := en.New()
+    uni := ut.New(en, en)
+
+    App.Translator, _ = uni.GetTranslator("en")
+    App.Validator = validator.New()
+
+    translations.RegisterDefaultTranslations(App.Validator, App.Translator)
 }
 
 /**

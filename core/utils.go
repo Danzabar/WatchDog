@@ -1,6 +1,7 @@
 package core
 
 import (
+    "gopkg.in/go-playground/validator.v9"
     "net/http"
     "strconv"
 )
@@ -20,6 +21,18 @@ func WriteResponse(w http.ResponseWriter, code int, resp RestResponse) {
 func WriteResponseHeader(w http.ResponseWriter, code int) {
     w.Header().Set("Content-Type", "application/json")
     w.WriteHeader(code)
+}
+
+func WriteValidationErrorResponse(w http.ResponseWriter, err error) {
+    v := RestResponse{
+        Errors: make(map[string]string),
+    }
+
+    for _, e := range err.(validator.ValidationErrors) {
+        v.Errors[e.Field()] = e.Translate(App.Translator)
+    }
+
+    WriteResponse(w, 400, v)
 }
 
 // Creates pagination options from given request

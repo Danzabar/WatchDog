@@ -28,7 +28,7 @@ func clear() {
 }
 
 func TestPostSubjectSuccess(t *testing.T) {
-    s := &core.Subject{Name: "Test"}
+    s := &core.Subject{Name: "Test", Domain: server.URL, PingURI: "/ping"}
     js, _ := json.Marshal(s)
 
     clear()
