@@ -54,7 +54,7 @@ func AnalyseStatus(a *core.Audit, s core.Subject) string {
     if a.ResponseTime > s.ResponseLimit {
         // Degredation? Yes please
         Shout.SendAlert(
-            fmt.Sprintf("%s domain has entered degredated status - response time was %d", s.Domain, a.ResponseTime),
+            fmt.Sprintf("%s domain has entered degredated status - response time was %f", s.Domain, a.ResponseTime),
             fmt.Sprintf("DEGREDATION: %s", s.Name),
         )
         return DEGREDATED
