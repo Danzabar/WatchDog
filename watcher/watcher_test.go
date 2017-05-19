@@ -138,3 +138,49 @@ func TestFailToConnectDuringTest(t *testing.T) {
     assert.Equal(t, CRITICAL, o.Status)
     assert.Equal(t, CRITICAL, o.Audits[0].Status)
 }
+
+func TestItSendsAlertsOnMemoryUsage(t *testing.T) {
+    clear()
+    s := core.Subject{
+        Domain:        server.URL,
+        PingURI:       "/health",
+        ResponseLimit: 5,
+        Name:          "TestMemoryUsage",
+        Advanced:      true,
+        MemLimit:      10,
+    }
+
+    a := &core.Audit{
+        Result: true,
+        Memory: 90,
+        CPU:    0,
+        Status: OK,
+    }
+
+    o := AnalyseStatus(a, s)
+
+    assert.Equal(t, DEGREDATED, o)
+}
+
+func TestItSendsAlertsOnCPUUsage(t *testing.T) {
+    clear()
+    s := core.Subject{
+        Domain:        server.URL,
+        PingURI:       "/health",
+        ResponseLimit: 5,
+        Name:          "TestMemoryUsage",
+        Advanced:      true,
+        CPULimit:      10,
+    }
+
+    a := &core.Audit{
+        Result: true,
+        Memory: 0,
+        CPU:    90,
+        Status: OK,
+    }
+
+    o := AnalyseStatus(a, s)
+
+    assert.Equal(t, DEGREDATED, o)
+}
