@@ -37,6 +37,8 @@ type Subject struct {
     Advanced      bool    `json:"advanced"`
     Hostname      string  `json:"host"`
     OS            string  `json:"os"`
+    CPULimit      float64 `json:"cpuLimit"`
+    MemLimit      float64 `json:"memLimit"`
     Platform      string  `json:"platform"`
     User          string  `json:"user,omitempty"`
     Pass          string  `json:"pass,omitempty"`
@@ -47,5 +49,13 @@ func (s *Subject) BeforeCreate() {
 
     if s.ResponseLimit == 0 {
         s.ResponseLimit = 2
+    }
+
+    if s.CPULimit == 0 {
+        s.CPULimit = 90
+    }
+
+    if s.MemLimit == 0 {
+        s.MemLimit = 90
     }
 }

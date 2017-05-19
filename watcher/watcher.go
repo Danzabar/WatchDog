@@ -60,6 +60,22 @@ func AnalyseStatus(a *core.Audit, s core.Subject) string {
         return DEGREDATED
     }
 
+    if s.Advanced && a.CPU >= s.CPULimit {
+        Shout.SendAlert(
+            fmt.Sprintf("%s domain has reached the CPU limit of %f - %f", s.Domain, s.CPULimit, a.CPU),
+            fmt.Sprintf("DEGREDATION: %s", s.Name),
+        )
+        return DEGREDATED
+    }
+
+    if s.Advanced && a.Memory >= s.MemLimit {
+        Shout.SendAlert(
+            fmt.Sprintf("%s domain has reached the Memory limit of %f - %f", s.Domain, s.MemLimit, a.Memory),
+            fmt.Sprintf("DEGREDATION: %s", s.Name),
+        )
+        return DEGREDATED
+    }
+
     // If we were previously at a different status, and we are ok
     // We want to know
     if s.Status != OK {
