@@ -13,7 +13,7 @@ func GetSubjects(w http.ResponseWriter, r *http.Request) {
 
     p := core.GetPaginationFromRequest(r, 20)
 
-    if err := core.App.DB.Find(&s).Limit(p.Limit).Offset(p.Offset).Error; err != nil {
+    if err := core.App.DB.Limit(p.Limit).Offset(p.Offset).Find(&s).Error; err != nil {
         core.WriteResponse(w, 500, core.RestResponse{Error: "Unable to fetch subjects"})
         return
     }
@@ -37,7 +37,11 @@ func GetSubjectDetails(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    core.App.DB.Where("subject_id = ?", s.Model.ID).Limit(p.Limit).Offset(p.Offset).Order("created_at DESC").Find(&a)
+    core.App.DB.Where("subject_id = ?", s.Model.ID).
+        Limit(p.Limit).
+        Offset(p.Offset).
+        Order("created_at DESC").
+        Find(&a)
 
     js, _ := core.NewSubjectResponse(s, a)
 
