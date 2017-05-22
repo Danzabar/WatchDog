@@ -1,0 +1,42 @@
+{% verbatim %}
+<article class="slds-card slds-size--1-of-3 slds-m-around--small" v-for="subject in subjects">
+  <div class="slds-card__header slds-grid">
+    <header class="slds-media slds-media_center slds-has-flexi-truncate">
+        <div class="slds-media__figure">
+        <span v-if="subject.status == statusOk" class="slds-icon_container slds-icon-action-approval slds-icon_container--circle" title="description of icon when needed">
+            <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/icons/action-sprite/svg/symbols.svg#approval"></use>
+            </svg>
+        </span>
+        <span v-if="subject.status == statusDegredated" class="slds-icon_container slds-icon-standard-contact" title="description of icon when needed">
+            <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/icons/standard-sprite/svg/symbols.svg#contact"></use>
+            </svg>
+        </span>
+        <span v-if="subject.status == statusCritical" class="slds-icon_container slds-icon-action-close slds-icon_container--circle" title="description of icon when needed">
+            <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/icons/action-sprite/svg/symbols.svg#question_post_action"></use>
+            </svg>
+        </span>    
+        </div>
+        <div class="slds-media__body">
+            <h2>
+            <a href="javascript:void(0);" class="slds-card__header-link slds-truncate" v-bind:title="subject.name">
+                <span class="slds-text-heading_small">{{ subject.name }}</span>
+            </a>
+            </h2>
+        </div>
+    </header>
+    <div class="slds-col">
+        <div class="slds-button-group" role="group">
+          <button class="slds-button slds-button--neutral">Refresh</button>
+          <button class="slds-button slds-button--neutral">Edit</button>
+          <button class="slds-button slds-button--neutral">Save</button>
+        </div>
+    </div>
+    </div>
+    <footer class="slds-card__footer">
+        Watched {{ subject.updated_at|date }}
+    </footer>
+</article>
+{% endverbatim %}
