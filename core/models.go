@@ -28,6 +28,7 @@ type Audit struct {
 type Subject struct {
     Model
     Audits        []Audit `json:"audits,omitempty"`
+    Active        bool    `json:"active"`
     Name          string  `json:"name" gorm:"unique" validate:"required"`
     Domain        string  `json:"domain" validate:"required"`
     PingURI       string  `json:"ping" validate:"required"`
@@ -46,6 +47,9 @@ type Subject struct {
 
 func (s *Subject) BeforeCreate() {
     s.ExtId, _ = shortid.Generate()
+
+    // Active by default
+    s.Active = true
 
     if s.ResponseLimit == 0 {
         s.ResponseLimit = 2

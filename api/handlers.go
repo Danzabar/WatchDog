@@ -49,6 +49,24 @@ func GetSubjectDetails(w http.ResponseWriter, r *http.Request) {
     w.Write(js)
 }
 
+// [POST] /api/v1/subject/{id}/activate
+func PostToggleSubjectActivation(w http.ResponseWriter, r *http.Request) {
+    var s core.Subject
+    params := mux.Vars(r)
+
+    if err := core.App.DB.Where("ext_id = ?", params["id"]).Find(&s).Error; err != nil {
+        core.WriteResponse(w, 404, core.RestResponse{Error: "Subject not found"})
+        return
+    }
+
+    s.Active = !s.Active
+    core.App.DB.Save(s)
+
+    js, _ := json.Marshal(s)
+    core.WriteResponseHeader(w, 200)
+    w.Write(js)
+}
+
 // [POST] /api/v1/subject
 func PostSubject(w http.ResponseWriter, r *http.Request) {
     var s core.Subject

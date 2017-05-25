@@ -12,44 +12,64 @@
           </span>
         </div>
         <div class="slds-media__body">
-          <h1 class="slds-page-header__title slds-truncate slds-align-middle" title="Dashboard">Dashboard</h1>
+          {% verbatim %}
+          <h1 class="slds-page-header__title slds-truncate slds-align-middle" v-bind:title="pageTitle">{{ pageTitle }}</h1>
+          {% endverbatim %}
         </div>
       </div>
     </div>
-    <div class="slds-container--x-large slds-container--center">
-      <div v-if="activeSubject == null" class="slds-grid">
-          {% include "components/subject_list.html" %}
-      </div>
+    <div v-if="activeSubject == null" class="slds-grid slds-wrap">
+        {% include "components/subject_list.html" %}
+    </div>
+    <div v-if="activeSubject != null" class="slds-grid slds-wrap">
+        {% include "components/subject.html" %}
     </div>
 </div>
 <script>
 const status = new Vue({
     el: "#status",
     data: {
-        subjects: [],
-        activeSubject: null,
-        statusOk: "ok",
-        statusDegredated: "degredated",
-        statusCritical: "critical"
+      subjects: [],
+      activeSubject: null,
+      statusOk: "ok",
+      statusDegredated: "degredated",
+      statusCritical: "critical",
+      pageTitle: "Dashboard"
     },
     mounted: function() {
       this.fetchSubjects()
     },
     methods: {
-      fetchSubjects: function() {
-          axios.get("/api/v1/subject")
-          .then(r => {
-              if (r.status === 200) {
-                  this.subjects = r.data
-              }
-          })
+      onSubjectSelect: function(e, id) {
+        axios.get(`/api/v1/subject/${id}`)
+        .then(r => {
+          if (r.status === 200) {
+            this.activeSubject = r.data
+            this.pageTitle = r.data.subject.name
+          }
+        })
+        .catch(e => {
+          // deal with err
+          console.log(e)
+        })
       },
-      initGraphs: function() {
-        this.subjects.forEach(s => {
-          Plotly.plot(document.getElementById(s.extId), [{
-            x: [1, 2, 3, 4, 5],
-            y: [1, 2, 4, 8, 16]
-          }])
+      onSubjectDelete: function(e, id) {
+        axios.delete(`/api/v1/subject/${id}`)
+        .then(r => {
+          if (r.status === 200) {
+            this.fetchSubjects()
+          }
+        })
+        .catch(e => {
+          console.log(e)
+        })
+      },
+      fetchSubjects: function() {
+        axios.get("/api/v1/subject")
+        .then(r => {
+            if (r.status === 200) {
+              this.subjects = r.data
+            }
         })
       },
       fetchAudits: function(subjectId) {

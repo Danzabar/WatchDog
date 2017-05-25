@@ -118,3 +118,52 @@ func TestDeleteSubjectNotFound(t *testing.T) {
 
     assert.Equal(t, http.StatusNotFound, resp.StatusCode)
 }
+
+func TestActivateSubject(t *testing.T) {
+    clear()
+    s := &core.Subject{Name: "Test"}
+    core.App.DB.Create(s)
+    s.Active = false
+    core.App.DB.Save(s)
+
+    req, _ := http.NewRequest("POST", fmt.Sprintf("%s/api/v1/subject/%s/activate", server.URL, s.ExtId), nil)
+    resp, err := http.DefaultClient.Do(req)
+
+    if err != nil {
+        t.Fatal(err)
+    }
+
+    var o core.Subject
+    json.NewDecoder(resp.Body).Decode(&o)
+
+    assert.Equal(t, true, o.Active)
+}
+
+func TestDeactivateSubject(t *testing.T) {
+    clear()
+    s := &core.Subject{Name: "Test"}
+    core.App.DB.Create(s)
+
+    req, _ := http.NewRequest("POST", fmt.Sprintf("%s/api/v1/subject/%s/activate", server.URL, s.ExtId), nil)
+    resp, err := http.DefaultClient.Do(req)
+
+    if err != nil {
+        t.Fatal(err)
+    }
+
+    var o core.Subject
+    json.NewDecoder(resp.Body).Decode(&o)
+
+    assert.Equal(t, false, o.Active)
+}
+
+func TestActivateNotFound(t *testing.T) {
+    req, _ := http.NewRequest("POST", fmt.Sprintf("%s/api/v1/subject/fake-1234/activate", server.URL), nil)
+    resp, err := http.DefaultClient.Do(req)
+
+    if err != nil {
+        t.Fatal(err)
+    }
+
+    assert.Equal(t, http.StatusNotFound, resp.StatusCode)
+}

@@ -1,5 +1,5 @@
 {% verbatim %}
-<article class="slds-card slds-size--1-of-3 slds-m-around--small" v-for="subject in subjects">
+<article class="slds-card slds-size--1-of-4 slds-m-around--small" v-for="subject in subjects">
   <div class="slds-card__header slds-grid">
     <header class="slds-media slds-media_center slds-has-flexi-truncate">
         <div class="slds-media__figure">
@@ -27,11 +27,20 @@
             </h2>
         </div>
     </header>
-    <div class="slds-col">
+    <div class="slds-card__body">
         <div class="slds-button-group" role="group">
-          <button class="slds-button slds-button--neutral">Refresh</button>
-          <button class="slds-button slds-button--neutral">Edit</button>
-          <button class="slds-button slds-button--neutral">Save</button>
+          <button class="slds-button slds-button-icon slds-button--neutral" title="View Service" v-on:click="onSubjectSelect($event, subject.extId)">
+            <svg class="slds-button__icon" aria-hidden="true">
+              <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/icons/action-sprite/svg/symbols.svg#preview"></use>
+            </svg>
+            <span class="slds-assistive-text">View Service</span>
+          </button>
+          <button class="slds-button slds-button-icon slds-button--destructive" title="Delete service" v-on:click="onSubjectDelete($event, subject.extId)">
+            <svg class="slds-button__icon" aria-hidden="true">
+              <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/icons/action-sprite/svg/symbols.svg#close"></use>
+            </svg>
+            <span class="slds-assistive-text">Delete Service</span>
+          </button>
         </div>
     </div>
     </div>
