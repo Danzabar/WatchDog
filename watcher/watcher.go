@@ -32,7 +32,7 @@ func Watch() {
     var s []core.Subject
 
     core.App.Log.Debug("Starting watcher...")
-    core.App.DB.Find(&s)
+    core.App.DB.Where("active = ?", true).Find(&s)
 
     for _, v := range s {
         core.App.Log.Debugf("Checking %s", v.Name)

@@ -32,6 +32,27 @@ func clear() {
     core.App.DB.Delete(&core.Audit{})
 }
 
+func TestWatchingOnUnActiveSubjects(t *testing.T) {
+    clear()
+    s := &core.Subject{
+        Domain:        server.URL,
+        PingURI:       "/health",
+        ResponseLimit: 5,
+        Name:          "TestSuccess",
+    }
+
+    core.App.DB.Create(s)
+    s.Active = false
+    core.App.DB.Save(s)
+
+    Watch()
+
+    var o core.Subject
+    core.App.DB.Where("ext_id = ?", s.ExtId).Find(&o)
+
+    assert.Equal(t, "", o.Status)
+}
+
 func TestWatchWithSuccessSubject(t *testing.T) {
     clear()
     s := &core.Subject{
