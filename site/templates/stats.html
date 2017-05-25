@@ -64,6 +64,17 @@ const status = new Vue({
           console.log(e)
         })
       },
+      onSubjectActivate: function(e, id) {
+        axios.post(`/api/v1/subject/${id}/activate`)
+        .then(r => {
+          if (r.status === 200) {
+            this.fetchSubjects()
+          }
+        })
+        .catch(e => {
+          console.log(e)
+        })
+      }
       fetchSubjects: function() {
         axios.get("/api/v1/subject")
         .then(r => {
