@@ -6,6 +6,38 @@
     <div class="slds-col" id="uptime"></div>
 </div>
 <div class="slds-size--1-of-3">
-    <div class="slds-col" id="statusStats"></div>
+    <div class="slds-col">
+        <div class="slds-section slds-is-open">
+          <h3 class="slds-section__title slds-theme--shade">
+            <span class="slds-truncate slds-p-around--small" title="Section Title">Information</span>
+          </h3>
+          <div aria-hidden="false" class="slds-section__content">
+            <dl class="slds-dl--horizontal">
+              <dt class="slds-dl--horizontal__label">Platform</dt>
+              <dd class="slds-dl--horizontal__detail">{{ activeSubject.subject.platform | unknown }}</dd>
+              <dt class="slds-dl--horizontal__label">OS</dt>
+              <dd class="slds-dl--horizontal__detail">{{ activeSubject.subject.os | unknown }}</dd>
+              <dt class="slds-dl--horizontal__label">Host</dt>
+              <dd class="slds-dl--horizontal__detail">{{ activeSubject.subject.host | unknown }}</dd>
+              <dt class="slds-dl--horizontal__label">Identifier</dt>
+              <dd class="slds-dl--horizontal__detail">{{ activeSubject.subject.extId | unknown }}</dd>
+              <dt class="slds-dl--horizontal__label">Created</dt>
+              <dd class="slds-dl--horizontal__detail">{{ activeSubject.subject.createdAt | date }}</dd>
+              <dt class="slds-dl--horizontal__label">Updated</dt>
+              <dd class="slds-dl--horizontal__detail">{{ activeSubject.subject.updatedAt | date }}</dd>
+            </dl>
+          </div>
+        </div>
+    </div>
+    <div class="slds-col">
+        <div class="slds-section slds-is-open">
+          <h3 class="slds-section__title slds-theme--shade">
+            <span class="slds-truncate slds-p-around--small" title="Section Title">Status</span>
+          </h3>
+          <div aria-hidden="false" class="slds-section__content" id="statusStats">
+           
+          </div>
+        </div>
+    </div>
 </div>
 {% endverbatim %}

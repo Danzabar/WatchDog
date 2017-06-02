@@ -16,6 +16,10 @@
         Vue.filter('date', function(v) {
             return moment(v).fromNow()
         })
+
+        Vue.filter('unknown', function(v) {
+            return (v ? v : "unknown")
+        })
     </script>
     {% block scripts %}{% endblock %}
 </head>
