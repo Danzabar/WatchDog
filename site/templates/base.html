@@ -6,10 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Watch dog - Service Status'</title>
     <link rel="stylesheet" type="text/css" href="/styles/salesforce-lightning-design-system.min.css">
+    <link rel="stylesheet" type="text/css" href="/styles/custom.css">
     {% block css %}{% endblock %} 
     <script src="/scripts/axios.min.js"></script>
     <script src="/scripts/vue.js"></script>
     <script src="/scripts/moment.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script>
         Vue.filter('date', function(v) {
             return moment(v).fromNow()

@@ -1,0 +1,7 @@
+.slds-card+.slds-card {
+    margin-top: 2rem;
+}
+
+[v-cloak] {
+    display:none;
+}

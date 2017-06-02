@@ -30,7 +30,7 @@ func GetSubjectDetails(w http.ResponseWriter, r *http.Request) {
     var a []core.Audit
 
     params := mux.Vars(r)
-    p := core.GetPaginationFromRequest(r, 50)
+    p := core.GetPaginationFromRequest(r, 1000)
 
     if err := core.App.DB.Where("ext_id = ?", params["id"]).Find(&s).Error; err != nil {
         core.WriteResponse(w, 404, core.RestResponse{Error: "Subject not found"})

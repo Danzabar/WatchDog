@@ -1,0 +1,84 @@
+{% verbatim %}
+<section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+  <div class="slds-modal__container">
+    <header class="slds-modal__header">
+      <button class="slds-button slds-button--icon slds-modal__close slds-button--icon-inverse" v-on:click="createForm = false" title="Close">
+        <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+          <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/icons/utility-sprite/svg/symbols.svg#close"></use>
+        </svg>
+        <span class="slds-assistive-text">Close</span>
+      </button>
+      <h2 id="modal-heading-01" class="slds-text-heading--medium slds-hyphenate">Add a new service</h2>
+    </header>
+    <div class="slds-modal__content slds-p-around--medium">
+      <div class="slds-form slds-form--stacked" id="subject-create">
+        <div class="slds-form-element slds-m-top--medium">
+          <label class="slds-form-element__label" for="name"><abbr class="slds-required" title="required">*</abbr>Name</label>
+          <div class="slds-form-element__control">
+            <input type="text" id="name" class="slds-input" v-model="newSubject.name" placeholder="Awesome Service">
+          </div>
+        </div>
+        <div class="slds-form-element slds-m-top--medium">
+          <label class="slds-form-element__label" for="domain"><abbr class="slds-required" title="required">*</abbr>Domain</label>
+          <div class="slds-form-element__control">
+            <input type="text" id="domain" class="slds-input" v-model="newSubject.domain" placeholder="http://example.com">
+          </div>
+        </div>
+        <div class="slds-form-element slds-m-top--medium">
+          <label class="slds-form-element__label" for="pingURI"><abbr class="slds-required" title="required">*</abbr>Endpoint</label>
+          <div class="slds-form-element__control">
+            <input type="text" id="pingURI" class="slds-input" v-model="newSubject.ping" placeholder="/health">
+          </div>
+        </div>
+        <div class="slds-form-element slds-m-top--medium">
+          <label class="slds-form-element__label" for="user">User (for basic auth)</label>
+          <div class="slds-form-element__control">
+            <input type="text" id="user" class="slds-input" v-model="newSubject.user" placeholder="admin">
+          </div>
+        </div>
+        <div class="slds-form-element slds-m-top--medium">
+          <label class="slds-form-element__label" for="pass">Pass (for basic auth)</label>
+          <div class="slds-form-element__control">
+            <input type="password" id="pass" v-model="newSubject.pass" class="slds-input">
+          </div>
+        </div>
+        <div class="slds-form-element slds-m-top--medium">
+          <label class="slds-form-element__label" for="responseLimit">Response limit (seconds)</label>
+          <div class="slds-form-element__control">
+            <input type="number" id="responseLimit" class="slds-input" v-model="newSubject.responseLimit" placeholder="5">
+          </div>
+        </div>
+        <fieldset class="slds-form-element slds-m-top--medium">
+          <legend class="slds-form-element__legend slds-form-element__label">Advanced health check available?</legend>
+          <div class="slds-form-element__control">
+            <span class="slds-checkbox">
+              <input type="checkbox" name="default" v-model="newSubject.advanced" id="advanced">
+              <label class="slds-checkbox__label" for="advanced">
+                <span class="slds-checkbox--faux"></span>
+                <span class="slds-form-element__label">If unticked, options below won't be used, until this is activated</span>
+              </label>
+            </span>
+          </div>
+        </fieldset>
+        <div class="slds-form-element slds-m-top--medium">
+          <label class="slds-form-element__label" for="cpu-limit">CPU Limit (percent)</label>
+          <div class="slds-form-element__control">
+            <input type="number" id="cpuLimit" class="slds-input" v-model="newSubject.cpuLimit" placeholder="90">
+          </div>
+        </div>
+        <div class="slds-form-element slds-m-top--medium">
+          <label class="slds-form-element__label" for="mem-limit">Memory Limit (percent)</label>
+          <div class="slds-form-element__control">
+            <input type="number" id="memLimit" class="slds-input" v-model="newSubject.memLimit" placeholder="90">
+          </div>
+        </div>
+      </div>
+    </div>
+    <footer class="slds-modal__footer">
+      <button class="slds-button slds-button--neutral">Cancel</button>
+      <button class="slds-button slds-button--brand" v-on:click="createSubject">Create</button>
+    </footer>
+  </div>
+</section>
+<div class="slds-backdrop slds-backdrop--open"></div>
+{% endverbatim %}

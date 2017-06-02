@@ -1,29 +1,46 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div id="status"v-cloak>
-    <div class="slds-page-header slds-m-bottom--x-large">
-      <div class="slds-media">
-        <div class="slds-media__figure">
-          <span class="slds-icon_container slds-icon-standard-opportunity">
-            <svg class="slds-icon" aria-hidden="true">
-              <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/icons/action-sprite/svg/symbols.svg#share_polly"></use>
-            </svg>
-          </span>
+<div id="status" v-cloak>
+  <div class="slds-page-header">
+    <div class="slds-grid">
+      <div class="slds-col slds-has-flexi-truncate">
+        <div class="slds-media slds-no-space slds-grow">
+          <div class="slds-media__figure">
+            <span class="slds-icon_container slds-icon-standard-user" title="Description of icon when needed">
+              <svg class="slds-icon" aria-hidden="true">
+                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/icons/action-sprite/svg/symbols.svg#share_poll"></use>
+              </svg>
+            </span>
+          </div>
+          <div class="slds-media__body">
+            {% verbatim %}
+              <h1 class="slds-page-header__title slds-m-right_small slds-align-middle slds-truncate" v-bind:title="pageTitle">{{ pageTitle }}</h1>
+              <p class="slds-text-title_caps slds-line-height_reset">Watching services since... urm... some time</p>
+            {% endverbatim %}
+          </div>
         </div>
-        <div class="slds-media__body">
-          {% verbatim %}
-          <h1 class="slds-page-header__title slds-truncate slds-align-middle" v-bind:title="pageTitle">{{ pageTitle }}</h1>
-          {% endverbatim %}
+      </div>
+      <div class="slds-col slds-no-flex slds-grid slds-align-top">
+        <div class="slds-button-group" role="group" v-if="activeSubject == null">
+          <button class="slds-button slds-button--neutral" v-on:click="createForm = true">Add Service</button>
+          <button class="slds-button slds-button--neutral" v-on:click="fetchSubjects">Refresh</button>
+        </div>
+        <div class="slds-button-group" role="group" v-if="activeSubject != null">
+          <button class="slds-button slds-button--neutral" v-on:click="activeSubject = null">Back</button>
         </div>
       </div>
     </div>
-    <div v-if="activeSubject == null" class="slds-grid slds-wrap">
-        {% include "components/subject_list.html" %}
-    </div>
-    <div v-if="activeSubject != null" class="slds-grid slds-wrap">
-        {% include "components/subject.html" %}
-    </div>
+  </div>
+  <div v-if="activeSubject == null" class="slds-grid slds-wrap">
+      {% include "components/subject_list.html" %}
+  </div>
+  <div v-if="activeSubject != null" class="slds-grid slds-wrap">
+      {% include "components/subject.html" %}
+  </div>
+  <div v-if="createForm">
+      {% include "components/subject_create.html" %}
+  </div>
 </div>
 <script>
 const status = new Vue({
@@ -34,12 +51,44 @@ const status = new Vue({
       statusOk: "ok",
       statusDegredated: "degredated",
       statusCritical: "critical",
-      pageTitle: "Dashboard"
+      pageTitle: "Watch Dog",
+      createForm: false,
+      hasGraphs: false,
+      cpuData: {},
+      memData: {},
+      upData: {},
+      resData: {},
+      statusData: {},
+      newSubject: {
+        name: "",
+        user: "",
+        pass: "",
+        responseLimit: 5,
+        cpuLimit: 90,
+        memLimit: 90,
+        domain: "",
+        ping: "",
+        advanced: false
+      }
     },
     mounted: function() {
       this.fetchSubjects()
     },
     methods: {
+      createSubject: function() {
+        console.log(this.newSubject)
+        axios.post("/api/v1/subject", this.newSubject)
+        .then(r => {
+          console.log(r)
+          if (r.status === 200) {
+            this.createForm = false
+            this.fetchSubjects()
+          }
+        })
+        .catch(e => {
+          this.handleError(e, document.getElementById("subject-create"))
+        })
+      },
       onSubjectSelect: function(e, id) {
         axios.get(`/api/v1/subject/${id}`)
         .then(r => {
@@ -48,9 +97,11 @@ const status = new Vue({
             this.pageTitle = r.data.subject.name
           }
         })
+        .then(() => {
+            this.loadSubjectGraph()
+        })
         .catch(e => {
-          // deal with err
-          console.log(e)
+          this.handleError(e)
         })
       },
       onSubjectDelete: function(e, id) {
@@ -61,7 +112,7 @@ const status = new Vue({
           }
         })
         .catch(e => {
-          console.log(e)
+          this.handleError(e)
         })
       },
       onSubjectActivate: function(e, id) {
@@ -72,19 +123,97 @@ const status = new Vue({
           }
         })
         .catch(e => {
-          console.log(e)
+          this.handleError(e)
         })
-      }
+      },
       fetchSubjects: function() {
         axios.get("/api/v1/subject")
         .then(r => {
             if (r.status === 200) {
               this.subjects = r.data
+              console.log(this.subjects)
             }
         })
       },
-      fetchAudits: function(subjectId) {
+      loadSubjectGraph: function() {
+        this.cpuData = {x: [], y: [], mode: "lines", type: "scatter"}
+        this.memData = {x: [], y: [], mode: "lines", type: "scatter"}
+        this.upData = {x: [], y: [], mode: "lines", type: "scatter"}
+        this.resData = {x: [], y: [], mode: "lines", type: "scatter"}
+        this.statusData = {ok: 0, degredated: 0, critical: 0}
 
+        // Load graph data
+        this.activeSubject.audits.forEach(v => {
+          this.appendCpuData(v)
+          this.appendMemUsage(v)
+          this.appendUptime(v)
+          this.appendResponses(v)
+          this.statusData[v.status]++
+        })
+
+        console.log(this.statusData)
+
+        const statusChart = [{
+          values: [this.statusData.ok, this.statusData.degredated, this.statusData.critical],
+          labels: ["ok", "degredated", "critical"],
+          type: "pie",
+          marker: {
+            colors: ['rgb(85, 242, 143)', 'rgb(242, 207, 51)', 'rgb(252, 64, 51)']
+          }
+        }]
+
+        if (this.hasGraphs) {
+          Plotly.plot('cpu', [this.cpuData], {title: "CPU Usage"})
+          Plotly.plot('mem', [this.memData], {title: "Memory Usage"})
+          Plotly.plot('uptime', [this.upData], {title: "Uptime"})
+          Plotly.plot('response', [this.resData], {title: "Response Time"})
+          Plotly.plot('statusStats', statusChart, {title: "Service Status"})
+
+        } else {
+          // Create Graphs
+          Plotly.newPlot('cpu', [this.cpuData], {title: "CPU Usage"})
+          Plotly.newPlot('mem', [this.memData], {title: "Memory Usage"})
+          Plotly.newPlot('uptime', [this.upData], {title: "Uptime"})
+          Plotly.newPlot('response', [this.resData], {title: "Response Time"})
+          Plotly.newPlot('statusStats', statusChart, {title: "Service Status", height: 380, width: 480})
+
+          this.hasGraphs = true
+        }
+      },
+      appendCpuData: function(audit) {
+        this.cpuData.y.push(audit.cpu)
+        this.cpuData.x.push(audit.createdAt)
+      },
+      appendMemUsage: function(audit) {
+        this.memData.y.push(audit.memory)
+        this.memData.x.push(audit.createdAt)
+      },
+      appendUptime: function(audit) {
+        this.upData.y.push(Math.floor(((audit.uptime / 60)) / 60) / 24)
+        this.upData.x.push(audit.createdAt)
+      },
+      appendResponses: function(audit) {
+        this.resData.y.push(audit.responseTime.toFixed(2))
+        this.resData.x.push(audit.createdAt)
+      },
+      handleError: function(error, form) {
+        if (error.response) {
+          console.log(error.response.data);
+          if (error.response.data.errors) {
+            if (form) {
+              for (let [k, v] of Object.entries(error.response.data.errors)) {
+                const el = document.getElementById(k.charAt(0).toLowerCase() + k.slice(1)).parentElement.parentElement
+                el.classList.add("slds-has-error")
+              }
+            } else {
+
+            }
+          }
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log('Error', error.message);
+        }
       }
     }
 })
