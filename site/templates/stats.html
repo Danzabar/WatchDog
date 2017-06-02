@@ -168,7 +168,7 @@ const status = new Vue({
           Plotly.plot('mem', [this.memData], {title: "Memory Usage"})
           Plotly.plot('uptime', [this.upData], {title: "Uptime"})
           Plotly.plot('response', [this.resData], {title: "Response Time"})
-          Plotly.plot('statusStats', statusChart, {})
+          Plotly.plot('statusStats', statusChart, {height: 380, width: 480})
 
         } else {
           // Create Graphs
